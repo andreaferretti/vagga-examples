@@ -1,0 +1,50 @@
+containers:
+  c:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !Install [build-essential]
+  nim:
+    setup:
+    - !Container c
+    - !BuildDeps [git, ca-certificates]
+    - !Env NIM: /opt/nim
+    - !Sh |
+        git clone https://github.com/nim-lang/Nim.git $NIM
+        cd $NIM
+        git clone --depth 1 https://github.com/nim-lang/csources
+        cd csources
+        sh build.sh
+        cd ..
+        bin/nim c koch
+        ./koch boot -d:release -d:useGnuReadline
+    environ:
+      PATH: "/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  nimble:
+    setup:
+    - !Container nim
+    - !Install [git, ca-certificates]
+    - !Env
+      HOME: /work/.home
+      PATH: "/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    - !Sh |
+        git clone https://github.com/nim-lang/nimble.git
+        cd nimble
+        git clone -b v0.13.0 --depth 1 https://github.com/nim-lang/nim vendor/nim
+        nim c -r src/nimble install
+    - !Remove /work/nimble
+    environ:
+      PATH: "/work/.home/.nimble/bin:/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
+commands:
+  nim: !Command
+    container: nim
+    run: [nim]
+    description: Runs Nim compiler
+  nimble: !Command
+    container: nimble
+    run: [nimble]
+    description: Runs Nimble package manager
+  sh: !Command
+    container: nimble
+    run: bash
+    description: Enter a shell with Nim and Nimble available

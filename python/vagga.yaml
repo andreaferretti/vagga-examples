@@ -1,0 +1,28 @@
+containers:
+  python:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !Install [build-essential]
+    - !Env
+      PATH: /work/.home/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      HOME: /work/.home
+    - !EnsureDir /work/.home
+    - !Download
+      url: https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+      path: /work/.home/miniconda
+      mode: 0o744
+    - !Sh "$HOME/miniconda -b -f -p $HOME/conda"
+    - !Remove /work/.home/miniconda
+    environ:
+      PATH: "/work/.home/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
+commands:
+  python: !Command
+    container: python
+    run: [python]
+    description: Run the Python interpreter
+  sh: !Command
+    container: python
+    run: bash
+    description: Enter a shell with Python available

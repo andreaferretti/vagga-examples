@@ -1,0 +1,32 @@
+containers:
+  jvm:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !Install [openjdk-8-jre-headless, ca-certificates]
+  sbt:
+    setup:
+    - !Container jvm
+    - !Install [curl]
+    - !EnsureDir /work/.home/sbt
+    - !Download
+      url: https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
+      path: /work/.home/sbt/sbt
+      mode: 0o744
+    - !Sh "sed -i '/^root/{s@/root@/work/.home@;}' /etc/passwd"
+    volumes:
+      /tmp: !Tmpfs
+      size: 100Mi
+      mode: 0o1777
+    environ:
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
+commands:
+  scala: !Command
+    container: sbt
+    run: sbt -sbt-create console
+    description: Run a scala console
+  sh: !Command
+    container: sbt
+    run: bash
+    description: Enter a shell with sbt available
