@@ -17,11 +17,23 @@ containers:
     environ:
       PATH: "/work/.home/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       HOME: /work/.home
+  jupyter:
+    setup:
+      - !Container python
+      - !Sh |
+          conda install -y ipython-notebook
+    environ:
+      PATH: "/work/.home/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
 commands:
   python: !Command
     container: python
     run: [python]
     description: Run the Python interpreter
+  ipython: !Command
+    container: jupyter
+    run: ipython notebook
+    description: Run the Python notebook
   sh: !Command
     container: python
     run: bash
