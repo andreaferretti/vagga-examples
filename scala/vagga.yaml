@@ -3,7 +3,7 @@ containers:
     setup:
     - !UbuntuRelease { version: 15.04 }
     - !UbuntuUniverse
-    - !Install [openjdk-8-jre-headless, ca-certificates]
+    - !Install [openjdk-8-jdk, ca-certificates]
   sbt:
     setup:
     - !Container jvm
@@ -21,11 +21,41 @@ containers:
     environ:
       PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       HOME: /work/.home
+  iscala:
+    setup:
+    - !Container sbt
+    - !Env
+      HOME: /work/.home
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    # Install iPython
+    - !PipConfig
+      dependencies: true
+    - !Py3Install ["ipython[notebook]==2.4.1"]
+    # Install iScala kernel
+    - !Git
+      url: https://github.com/mattpap/IScala.git
+      path: /work/.home/iscala
+    - !Sh |
+        cd $HOME/iscala
+        sbt assembly
+    environ:
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
+      KERNEL_PARAMS: |
+        ["java", "-jar", ".home/iscala/target/scala-2.11/lib/IScala.jar", "--connection-file", "{connection_file}", "--parent"]
 commands:
   scala: !Command
     container: sbt
     run: sbt -sbt-create console
     description: Run a scala console
+  sbt: !Command
+    container: sbt
+    run: [sbt]
+    description: Run sbt
+  iscala: !Command
+    container: iscala
+    run: ipython notebook --KernelManager.kernel_cmd="$KERNEL_PARAMS"
+    description: Run a scala notebook
   sh: !Command
     container: sbt
     run: bash
