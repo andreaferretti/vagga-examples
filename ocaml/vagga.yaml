@@ -1,0 +1,47 @@
+containers:
+  opam:
+    setup:
+    - !Env
+      HOME: /work/.home
+      OCAML_VERSION: 4.02.1
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !Install [opam]
+    - !Sh |
+        opam init --yes --comp $OCAML_VERSION
+        opam config setup -a
+    environ:
+      HOME: /work/.home
+  utop:
+    setup:
+    - !Container opam
+    - !Install [m4, aspcud]
+    - !Sh |
+        eval `opam config env`
+        opam install --yes core utop
+    - !Text
+      /work/.home/.ocamlinit: |
+        #use "topfind";;
+        #thread;;
+        #camlp4o;;
+        #require "core.top";;
+        #require "core.syntax";;
+    environ:
+      HOME: /work/.home
+commands:
+  ocaml: !Command
+    container: opam
+    run: |
+      eval `opam config env`
+      ocaml
+    description: Run an OCaml console
+  utop: !Command
+    container: utop
+    run: |
+      eval `opam config env`
+      utop
+    description: Run an OCaml uTop console
+  sh: !Command
+    container: utop
+    run: bash
+    description: Enter a shell with OPAM available
