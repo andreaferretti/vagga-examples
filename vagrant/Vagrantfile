@@ -1,23 +1,13 @@
+unless Vagrant.has_plugin?("vagrant-vagga")
+  abort 'vagrant-vagga plugin is not installed! Do first # vagrant plugin install vagrant-vagga'
+end
+
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/vivid64"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.network "forwarded_port", guest: 6379, host: 6379
-  config.vm.synced_folder ".", "/shared"#, :mount_options => ["dmode=777","fmode=777"]
+  config.vm.provision :vagga
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2048"
   end
-
-  # config.vm.provision "shell", run: "always", inline: <<-SHELL
-  #   mkdir /var/vagga
-  #   mount --bind /var/vagga /home/vagrant/vagga/.vagga
-  # SHELL
-
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo add-apt-repository 'deb http://ubuntu.zerogw.com vagga-testing main'
-    sudo apt-get update
-    sudo apt-get install -y --force-yes vagga
-    if [ -f /shared/vagga.yaml ]; then
-      cp /shared/vagga.yaml /home/vagrant
-    fi
-  SHELL
 end
