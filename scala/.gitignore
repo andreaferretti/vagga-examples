@@ -1,3 +1,4 @@
 .home
 target
 .ipynb_checkpoints
+*.ipynb
