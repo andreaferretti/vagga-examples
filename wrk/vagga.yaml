@@ -1,0 +1,21 @@
+containers:
+  wrk:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !Install [build-essential, libssl-dev]
+    - !Git
+      url: https://github.com/wg/wrk.git
+      path: /opt/wrk
+    - !Sh |
+        cd /opt/wrk
+        make
+commands:
+  wrk: !Command
+    container: wrk
+    run: [/opt/wrk/wrk]
+    description: Run wrk
+  sh: !Command
+    container: wrk
+    run: bash
+    description: Enter a shell with wrk available
