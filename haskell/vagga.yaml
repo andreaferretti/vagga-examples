@@ -1,0 +1,25 @@
+containers:
+  platform:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !AptTrust keys: [575159689BEFB442]
+    - !UbuntuRepo
+      url: http://download.fpcomplete.com/ubuntu
+      suite: vivid
+      components: [main]
+    - !Install [ca-certificates, netbase, stack]
+    - !Env
+      HOME: /work/.home
+    - !Sh "stack setup"
+    environ:
+      HOME: /work/.home
+commands:
+  haskell: !Command
+    container: platform
+    run: stack ghci
+    description: Run a Haskell interpreter
+  sh: !Command
+    container: platform
+    run: bash
+    description: Enter a shell with the Haskell platform available
