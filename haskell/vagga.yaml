@@ -19,6 +19,10 @@ commands:
     container: platform
     run: stack ghci
     description: Run a Haskell interpreter
+  ghc: !Command
+    container: platform
+    run: stack ghc
+    description: Run GHC
   sh: !Command
     container: platform
     run: bash
