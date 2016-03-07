@@ -4,7 +4,8 @@ end
 
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
-  config.vm.network "forwarded_port", guest: 6379, host: 6379
+  # config.vm.network "forwarded_port", guest: 6379, host: 6379
+  config.vm.network "private_network", ip: "10.0.0.19", netmask: "255.255.255.0"
   config.vm.provision :vagga
 
   config.vm.provider "virtualbox" do |vb|
