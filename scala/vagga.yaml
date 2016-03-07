@@ -43,6 +43,26 @@ containers:
       HOME: /work/.home
       KERNEL_PARAMS: |
         ["java", "-jar", ".home/iscala/target/scala-2.11/lib/IScala.jar", "--connection-file", "{connection_file}", "--parent"]
+  jupyter:
+    setup:
+    - !Container sbt
+    - !Env
+      HOME: /work/.home
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    # Install iPython
+    - !PipConfig
+      dependencies: true
+    - !Py3Install [jupyter]
+    - !Tar
+      url: https://oss.sonatype.org/content/repositories/snapshots/com/github/alexarchambault/jupyter/jupyter-scala-cli_2.11.6/0.2.0-SNAPSHOT/jupyter-scala_2.11.6-0.2.0-SNAPSHOT.tar.xz
+      path: /work/.home
+      subdir: .
+    - !Sh |
+        cd $HOME/jupyter-scala_2.11.6-0.2.0-SNAPSHOT
+        bin/jupyter-scala
+    environ:
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
 commands:
   scala: !Command
     container: sbt
@@ -55,8 +75,12 @@ commands:
   iscala: !Command
     container: iscala
     run: ipython notebook --ip='*' --KernelManager.kernel_cmd="$KERNEL_PARAMS"
-    description: Run a scala notebook
+    description: Run a scala notebook (classic version)
+  iscala-jupyter: !Command
+    container: jupyter
+    run: jupyter notebook
+    description: Run a scala notebook (jupyter version)
   sh: !Command
-    container: sbt
+    container: jupyter
     run: bash
     description: Enter a shell with sbt available
