@@ -1,0 +1,27 @@
+containers:
+  django:
+    setup:
+    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuUniverse
+    - !PipConfig
+      dependencies: true
+    - !Py3Requirements "requirements.txt"
+    - !Download
+      url: https://raw.githubusercontent.com/django/django/master/extras/django_bash_completion
+      path: /opt/django-bash-completion
+    - !Text
+      /root/.bashrc: |
+         . /opt/django-bash-completion
+commands:
+  admin: !Command
+    container: django
+    run: [django-admin]
+    description: Run django administration commands
+  py: !Command
+    container: django
+    run: [python3]
+    description: Run django administration commands
+  sh: !Command
+    container: django
+    run: bash
+    description: Run a shell with django available
