@@ -1,0 +1,55 @@
+containers:
+  jvm:
+    setup:
+    - !UbuntuRelease { version: 16.04 }
+    - !UbuntuUniverse
+    - !Install [openjdk-8-jdk, ca-certificates]
+  sbt:
+    setup:
+    - !Container jvm
+    - !Install [curl]
+    - !EnsureDir /work/.home/sbt
+    - !Download
+      url: https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt
+      path: /work/.home/sbt/sbt
+      mode: 0o744
+    - !Sh "sed -i '/^root/{s@/root@/work/.home@;}' /etc/passwd"
+    volumes:
+      /tmp: !Tmpfs
+      size: 100Mi
+      mode: 0o1777
+  deps:
+    setup:
+      - !Container sbt
+      - !Install [clang, llvm, llvm-dev, llvm-runtime, libgc-dev]
+  scala-native:
+    setup:
+      - !Container deps
+      - !Install [git, ssh, sed]
+      - !Env
+        HOME: /work/.home
+        PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      - !Sh |
+          rm -rf scala-native
+          git clone https://github.com/scala-native/scala-native.git
+          cd scala-native
+          sed -i 's|__stdoutp|stdout|;s|__stderrp|stderr|' demo-native/smallpt.scala nativelib/src/main/scala/scala/scalanative/native/stdlib.scala
+          git submodule init
+          sed -i 's|git@github.com:|https://github.com/|' .git/config
+          git submodule update
+          sbt rtlib/publishLocal
+          sbt nscplugin/publishLocal
+          sbt compile
+    environ:
+      PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      HOME: /work/.home
+commands:
+  sbt: !Command
+    container: scala-native
+    run: sbt
+    work-dir: /work/scala-native
+    description: Enter sbt
+  sh: !Command
+    container: scala-native
+    run: bash
+    description: Enter a shell with sbt available
