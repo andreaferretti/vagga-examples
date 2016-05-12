@@ -18,14 +18,11 @@ containers:
       /tmp: !Tmpfs
       size: 100Mi
       mode: 0o1777
-  deps:
+  scala-native:
     setup:
       - !Container sbt
       - !Install [clang, llvm, llvm-dev, llvm-runtime, libgc-dev]
-  scala-native:
-    setup:
-      - !Container deps
-      - !Install [git, ssh, sed]
+      - !BuildDeps [git, ssh, sed]
       - !Env
         HOME: /work/.home
         PATH: "/work/.home/sbt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
