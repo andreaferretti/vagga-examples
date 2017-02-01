@@ -1,0 +1,4 @@
+*.bql
+*.schema
+*.rdf.gz
+*.graphql

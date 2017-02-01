@@ -60,3 +60,7 @@ commands:
     container: dgraph
     run: curl localhost:8080/admin/backup
     description: DGraph backup
+  query: !Command
+    container: dgraph
+    run: [curl, localhost:8080/query, -XPOST, --data-binary]
+    description: DGraph query
