@@ -1,0 +1,37 @@
+containers:
+  go:
+    setup:
+    - !Ubuntu "xenial"
+    - !EnsureDir /opt/gopath
+    - !BuildDeps [tar]
+    - !Download
+      url: https://storage.googleapis.com/golang/go1.7.5.linux-amd64.tar.gz
+      path: /tmp/go.tar.gz
+    - !Sh tar -C /usr/local -xzf /tmp/go.tar.gz
+    - !Remove /tmp/go.tar.gz
+    - !Env
+      PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      GOPATH: /opt/gopath
+    environ:
+      PATH: "/opt/gopath/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      GOPATH: /opt/gopath
+  badwolf:
+    setup:
+    - !Container go
+    - !BuildDeps [ca-certificates, git]
+    - !Sh |
+        go get golang.org/x/net/context
+        go get github.com/peterh/liner
+        go get github.com/google/badwolf/...
+    environ:
+      PATH: "/opt/gopath/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      GOPATH: /opt/gopath
+commands:
+  sh: !Command
+    container: badwolf
+    run: bash
+    description: Enter a shell with go available
+  bw: !Command
+    container: badwolf
+    run: [bw]
+    description: BadWolf command line tool
