@@ -23,6 +23,7 @@ containers:
         go get golang.org/x/net/context
         go get github.com/peterh/liner
         go get github.com/google/badwolf/...
+        go get github.com/xllora/bwdrivers/...
     environ:
       PATH: "/opt/gopath/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       GOPATH: /opt/gopath
