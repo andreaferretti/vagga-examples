@@ -2,3 +2,5 @@
 *.schema
 *.rdf.gz
 *.graphql
+/p
+/w
