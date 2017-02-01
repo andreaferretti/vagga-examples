@@ -27,12 +27,28 @@ containers:
     environ:
       PATH: "/opt/gopath/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       GOPATH: /opt/gopath
+  dgraph:
+    setup:
+    - !Ubuntu "xenial"
+    - !Tar
+      url: https://github.com/dgraph-io/dgraph/releases/download/v0.7.2/dgraph-linux-amd64-v0.7.2.tar.gz
+      path: /usr/local/bin
+    environ:
+      PATH: "/usr/local/bin/dgraph:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 commands:
   sh: !Command
-    container: badwolf
+    container: dgraph
     run: bash
     description: Enter a shell with go available
   bw: !Command
     container: badwolf
     run: [bw]
     description: BadWolf command line tool
+  dgraph: !Command
+    container: dgraph
+    run: [dgraph]
+    description: DGraph command line tool
+  dgraphloader: !Command
+    container: dgraph
+    run: [dgraphloader]
+    description: DGraph loader tool
