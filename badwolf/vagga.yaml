@@ -30,9 +30,13 @@ containers:
   dgraph:
     setup:
     - !Ubuntu "xenial"
+    - !Install [curl]
     - !Tar
       url: https://github.com/dgraph-io/dgraph/releases/download/v0.7.2/dgraph-linux-amd64-v0.7.2.tar.gz
       path: /usr/local/bin
+    - !Download
+      url: https://github.com/dgraph-io/goicu/raw/master/icudt58l.dat
+      path: /opt/icu.dat
     environ:
       PATH: "/usr/local/bin/dgraph:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 commands:
@@ -52,3 +56,7 @@ commands:
     container: dgraph
     run: [dgraphloader]
     description: DGraph loader tool
+  backup: !Command
+    container: dgraph
+    run: curl localhost:8080/admin/backup
+    description: DGraph backup
