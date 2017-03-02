@@ -1,7 +1,7 @@
 containers:
   c:
     setup:
-    - !UbuntuRelease { version: 15.04 }
+    - !UbuntuRelease { version: 16.04 }
     - !Install [build-essential]
   nim:
     setup:
@@ -11,39 +11,26 @@ containers:
     - !Sh |
         git clone https://github.com/nim-lang/Nim.git $NIM
         cd $NIM
+        git checkout v0.16.0
         git clone --depth 1 https://github.com/nim-lang/csources
         cd csources
         sh build.sh
         cd ..
         bin/nim c koch
         ./koch boot -d:release -d:useGnuReadline
+        ./koch tools
     environ:
       PATH: "/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-  nimble:
-    setup:
-    - !Container nim
-    - !Install [git, ca-certificates]
-    - !Env
-      HOME: /work/.home
-      PATH: "/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-    - !Sh |
-        git clone https://github.com/nim-lang/nimble.git
-        cd nimble
-        nim -d:release c -r src/nimble -y install
-    - !Remove /work/nimble
-    environ:
-      PATH: "/work/.home/.nimble/bin:/opt/nim/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-      HOME: /work/.home
 commands:
   nim: !Command
     container: nim
     run: [nim]
     description: Runs Nim compiler
   nimble: !Command
-    container: nimble
+    container: nim
     run: [nimble]
     description: Runs Nimble package manager
   sh: !Command
-    container: nimble
+    container: nim
     run: bash
     description: Enter a shell with Nim and Nimble available
